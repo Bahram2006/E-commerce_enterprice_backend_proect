@@ -13,12 +13,15 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
+import { Role } from '@prisma/client';
 
 interface AuthenticatedRequest extends Request {
   user: {
     id: string;
     email: string;
-    role: string;
+    role: Role;
   };
 }
 
@@ -38,11 +41,21 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  // Senior Çözgüt: Async/await we 'any' ulanman linteri doly ýatyrys
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @HttpCode(HttpStatus.OK)
   getProfile(@Req() req: AuthenticatedRequest) {
     return req.user;
+  }
+
+  // Senior Çözgüt: Bu salgy diňe ADMIN ýa-da MANAGER bolanlar üçin goralýar!
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @Get('admin-panel')
+  @HttpCode(HttpStatus.OK)
+  getAdminPanel() {
+    return {
+      message: 'Gözüňiz aýdyn! Admin paneline şowly girdiňiz.',
+    };
   }
 }
