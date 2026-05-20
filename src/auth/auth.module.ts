@@ -3,18 +3,22 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    // Senior Çözgüt: JWT motoryny hasaba alýarys we durnukly sazlaýarys
+    // Passport modulyny hem rəsmi hasaba alýarys
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      global: true, // Ähli modullarda elýeterli bolar ýaly global edýäris
+      global: true,
       secret: process.env.JWT_SECRET || 'super-secret-senior-key-2026',
-      signOptions: { expiresIn: '1d' }, // Tokeniň ömri 1 gün (Enterprise standart)
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService],
+  // JwtStrategy-ni providers sanawyna hökman goşýarys
+  providers: [AuthService, PrismaService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}
