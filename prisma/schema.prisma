@@ -1,0 +1,28 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enterprise E-Commerce Ulanyjy Modeli
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  firstName  String?
+  lastName   String?
+  role       Role     @default(CUSTOMER)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  MANAGER
+}
